@@ -2,7 +2,7 @@
 
 A comprehensive inventory management system designed for tracking End User Computing (EUC) assets across multiple locations in Western Australia and Darwin.
 
-<img src="asset-tracker-demo.gif" alt="App Demo" width="800"/>
+<img src="../asset-tracker-demo.gif" alt="App Demo" width="800"/>
 
 ## Overview
 
