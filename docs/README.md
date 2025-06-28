@@ -2,6 +2,8 @@
 
 A comprehensive inventory management system designed for tracking End User Computing (EUC) assets across multiple locations in Western Australia and Darwin.
 
+<img src="asset-tracker-demo.gif" alt="App Demo" width="800"/>
+
 ## Overview
 
 The EUC Asset Tracker is a Python-based desktop application that provides real-time inventory management capabilities for IT assets. The application features a modern GUI built with CustomTkinter and includes advanced asset tracking with Serial Asset Number (SAN) management for high-value items.
