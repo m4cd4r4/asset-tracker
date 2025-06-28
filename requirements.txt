@@ -1,0 +1,24 @@
+# EUC Asset Tracker Requirements
+# Python 3.8+ required
+
+# GUI Framework
+customtkinter>=5.0.0
+
+# Excel file manipulation
+openpyxl>=3.1.0
+
+# Data processing and analysis
+pandas>=1.5.0
+
+# Plotting and visualization
+matplotlib>=3.6.0
+
+# Built-in modules (included with Python)
+# tkinter - GUI components
+# datetime - Date and time handling
+# logging - Application logging
+# pathlib - File path operations
+# subprocess - External script execution
+# argparse - Command line argument parsing
+# os - Operating system interface
+# sys - System-specific parameters
