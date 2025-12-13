@@ -49,7 +49,7 @@ jobs:
           # App location - relative to repository root
           app_location: "web-app"
           # API location - relative to repository root
-          api_location: "web-app/api"
+          # api_location: "web-app/api"  # Disabled for Free tier
           # Built app location - relative to app_location
           output_location: "dist"
           # Skip app build since we did it above

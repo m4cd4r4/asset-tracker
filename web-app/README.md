@@ -131,3 +131,15 @@ For the API backend (optional):
 
 MIT
 
+
+## TensorFlow.js Configuration
+
+**Current: CDN Loading** - TensorFlow.js is loaded from a CDN to stay within Azure Static Web Apps Free tier limits (250MB).
+
+**Trade-off:** Box counting requires an internet connection and won't work offline.
+
+**To enable offline box counting:**
+1. In `vite.config.ts`, remove `@tensorflow/tfjs` and `@tensorflow-models/coco-ssd` from the `external` array
+2. In `index.html`, remove the TensorFlow CDN `<script>` tags
+3. In `src/hooks/useBoxCounter.ts`, change `window.tf`/`window.cocoSsd` back to imports
+4. Upgrade to Azure Static Web Apps Standard tier ($9/mo) or self-host
