@@ -59,9 +59,13 @@ export default defineConfig({
     sourcemap: false,
     chunkSizeWarningLimit: 3000,
     rollupOptions: {
+      external: ['@tensorflow/tfjs', '@tensorflow-models/coco-ssd'],
       output: {
+        globals: {
+          '@tensorflow/tfjs': 'tf',
+          '@tensorflow-models/coco-ssd': 'cocoSsd'
+        },
         manualChunks: {
-          tensorflow: ['@tensorflow/tfjs', '@tensorflow-models/coco-ssd'],
           zxing: ['@zxing/browser', '@zxing/library']
         }
       }

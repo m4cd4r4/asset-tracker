@@ -1,7 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import * as tf from '@tensorflow/tfjs';
-import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import type { BoxDetection, BoundingBox } from '@/types';
+
+// TensorFlow loaded from CDN - access via window globals
+declare global {
+  interface Window {
+    tf: any;
+    cocoSsd: any;
+  }
+}
 
 interface UseBoxCounter {
   isReady: boolean;
@@ -28,7 +34,7 @@ export function useBoxCounter(): UseBoxCounter {
   const [lastDetection, setLastDetection] = useState<BoxDetection | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const modelRef = useRef<cocoSsd.ObjectDetection | null>(null);
+  const modelRef = useRef<any>(null);
   const animationFrameRef = useRef<number | null>(null);
   const isCountingRef = useRef(false);
 
@@ -36,9 +42,17 @@ export function useBoxCounter(): UseBoxCounter {
   useEffect(() => {
     const loadModel = async () => {
       try {
+        const tf = window.tf;
+        const cocoSsd = window.cocoSsd;
+
+        if (!tf || !cocoSsd) {
+          setError('TensorFlow not loaded - box counting unavailable offline');
+          return;
+        }
+
         await tf.ready();
         modelRef.current = await cocoSsd.load({
-          base: 'lite_mobilenet_v2', // Faster, smaller model for mobile
+          base: 'lite_mobilenet_v2',
         });
         setIsReady(true);
       } catch (err) {
@@ -56,18 +70,17 @@ export function useBoxCounter(): UseBoxCounter {
   }, []);
 
   const processDetections = useCallback((
-    predictions: cocoSsd.DetectedObject[],
+    predictions: any[],
     targetClass?: string
   ): BoxDetection => {
-    // Filter for box-like objects or specific target class
-    const relevantPredictions = predictions.filter(p => {
+    const relevantPredictions = predictions.filter((p: any) => {
       if (targetClass) {
         return p.class.toLowerCase().includes(targetClass.toLowerCase());
       }
       return BOX_CLASSES.some(c => p.class.toLowerCase().includes(c)) || p.score > 0.7;
     });
 
-    const boundingBoxes: BoundingBox[] = relevantPredictions.map(p => ({
+    const boundingBoxes: BoundingBox[] = relevantPredictions.map((p: any) => ({
       x: p.bbox[0],
       y: p.bbox[1],
       width: p.bbox[2],
@@ -75,7 +88,6 @@ export function useBoxCounter(): UseBoxCounter {
       confidence: p.score,
     }));
 
-    // Calculate average confidence
     const avgConfidence = boundingBoxes.length > 0
       ? boundingBoxes.reduce((sum, b) => sum + b.confidence, 0) / boundingBoxes.length
       : 0;
@@ -137,7 +149,6 @@ export function useBoxCounter(): UseBoxCounter {
       }
 
       if (isCountingRef.current) {
-        // Throttle to ~10 FPS for performance
         animationFrameRef.current = requestAnimationFrame(() => {
           setTimeout(detectFrame, 100);
         });
