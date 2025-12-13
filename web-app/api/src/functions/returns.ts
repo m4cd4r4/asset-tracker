@@ -26,7 +26,7 @@ async function getReturns(request: HttpRequest, context: InvocationContext): Pro
     }
 
     // Sort by timestamp descending
-    returns.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    returns.sort((a, b) => new Date(String(b.timestamp || 0)).getTime() - new Date(String(a.timestamp || 0)).getTime());
 
     return { jsonBody: returns };
   } catch (error) {

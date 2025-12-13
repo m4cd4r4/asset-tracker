@@ -30,7 +30,7 @@ async function getTransactions(request: HttpRequest, context: InvocationContext)
     }
 
     // Sort by timestamp descending
-    transactions.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    transactions.sort((a, b) => new Date(String(b.timestamp || 0)).getTime() - new Date(String(a.timestamp || 0)).getTime());
 
     return { jsonBody: transactions };
   } catch (error) {

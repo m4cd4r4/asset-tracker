@@ -56,6 +56,15 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: false,
+    chunkSizeWarningLimit: 3000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          tensorflow: ['@tensorflow/tfjs', '@tensorflow-models/coco-ssd'],
+          zxing: ['@zxing/browser', '@zxing/library']
+        }
+      }
+    }
   }
 });
