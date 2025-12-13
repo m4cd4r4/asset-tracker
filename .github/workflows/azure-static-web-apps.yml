@@ -47,11 +47,11 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           # App location - relative to repository root
-          app_location: "web-app"
+          app_location: "web-app/dist"
           # API location - relative to repository root
           # api_location: "web-app/api"  # Disabled for Free tier
           # Built app location - relative to app_location
-          output_location: "dist"
+          output_location: ""
           # Skip app build since we did it above
           skip_app_build: true
 
