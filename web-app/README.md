@@ -143,3 +143,4 @@ MIT
 2. In `index.html`, remove the TensorFlow CDN `<script>` tags
 3. In `src/hooks/useBoxCounter.ts`, change `window.tf`/`window.cocoSsd` back to imports
 4. Upgrade to Azure Static Web Apps Standard tier ($9/mo) or self-host
+
