@@ -8,6 +8,7 @@ import { InventoryChart } from '@/components/InventoryChart';
 import { TransactionLog } from '@/components/TransactionLog';
 import { BarcodeScanner } from '@/components/BarcodeScanner';
 import { BoxCounter } from '@/components/BoxCounter';
+import { OCRScanner } from '@/components/OCRScanner';
 import { LowStockDialog } from '@/components/LowStockDialog';
 import { SANListDialog } from '@/components/SANListDialog';
 import { SANReturnModal } from '@/components/SANReturnModal';
@@ -24,6 +25,7 @@ function App() {
   const [showLowStock, setShowLowStock] = useState(false);
   const [showSANList, setShowSANList] = useState(false);
   const [showSANReturn, setShowSANReturn] = useState(false);
+  const [showOCR, setShowOCR] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [quickCount, setQuickCount] = useState<number | null>(null);
 
@@ -39,6 +41,12 @@ function App() {
     setShowBoxCounter(false);
     setQuickCount(count);
     setTimeout(() => setQuickCount(null), 10000);
+  };
+
+  const handleOCRScan = (san: string) => {
+    setShowOCR(false);
+    setScannedCode(san);
+    setTimeout(() => setScannedCode(null), 5000);
   };
 
   if (isLoading) {
@@ -62,6 +70,7 @@ function App() {
             onViewChange={setActiveView}
             onScanClick={() => setShowScanner(true)}
             onCountClick={() => setShowBoxCounter(true)}
+            onOCRClick={() => setShowOCR(true)}
             onLowStockClick={() => setShowLowStock(true)}
             onSANListClick={() => setShowSANList(true)}
           />
@@ -78,6 +87,7 @@ function App() {
               onLocationChange={() => setSidebarOpen(false)}
               onScanClick={() => { setShowScanner(true); setSidebarOpen(false); }}
               onCountClick={() => { setShowBoxCounter(true); setSidebarOpen(false); }}
+              onOCRClick={() => { setShowOCR(true); setSidebarOpen(false); }}
               onLowStockClick={() => { setShowLowStock(true); setSidebarOpen(false); }}
               onSANListClick={() => { setShowSANList(true); setSidebarOpen(false); }}
             />
@@ -91,6 +101,7 @@ function App() {
             onMenuClick={() => setSidebarOpen(true)}
             onScanClick={() => setShowScanner(true)}
             onCountClick={() => setShowBoxCounter(true)}
+            onOCRClick={() => setShowOCR(true)}
             onLowStockClick={() => setShowLowStock(true)}
           />
 
@@ -173,6 +184,13 @@ function App() {
           <BoxCounter
             onCount={handleBoxCount}
             onClose={() => setShowBoxCounter(false)}
+          />
+        )}
+
+        {showOCR && (
+          <OCRScanner
+            onScanSAN={handleOCRScan}
+            onClose={() => setShowOCR(false)}
           />
         )}
 

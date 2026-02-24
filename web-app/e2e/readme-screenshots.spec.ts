@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, viewport }) => {
+  test.skip(!!viewport && viewport.width < 768, 'Screenshot tests are desktop-only');
   await page.addInitScript(() => localStorage.clear());
   await page.goto('/');
   await page.waitForSelector('table');

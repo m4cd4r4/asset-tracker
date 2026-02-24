@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import {
-  Package, Activity, BarChart3, Hash, Scan, Box,
+  Package, Activity, BarChart3, Hash, Scan, Box, ScanText, Download,
   FileDown, FileUp, RotateCcw, AlertTriangle, ChevronDown,
   MapPin, Moon, Sun,
 } from 'lucide-react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { useTheme } from '@/hooks/useTheme';
 import { useStore } from '@/store/useStore';
 import { storage } from '@/services/storage';
@@ -18,6 +19,7 @@ interface SidebarProps {
   onViewChange: (view: string) => void;
   onScanClick: () => void;
   onCountClick: () => void;
+  onOCRClick?: () => void;
   onLowStockClick: () => void;
   onSANListClick: () => void;
   onLocationChange?: (id: string) => void;
@@ -28,6 +30,7 @@ export function Sidebar({
   onViewChange,
   onScanClick,
   onCountClick,
+  onOCRClick,
   onLowStockClick,
   onSANListClick,
   onLocationChange,
@@ -35,6 +38,7 @@ export function Sidebar({
   const { currentLocation, setLocation, getLowStockItems, assets } = useStore();
   const [showDataMenu, setShowDataMenu] = useState(false);
   const { dark, toggle: toggleTheme } = useTheme();
+  const { canInstall, install } = usePWAInstall();
   const lowStockCount = getLowStockItems().length;
 
   const handleExport = () => {
@@ -158,7 +162,7 @@ export function Sidebar({
       {/* Quick Actions */}
       <div className="px-3 py-3">
         <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Quick Actions</p>
-        <div className="grid grid-cols-2 gap-1.5">
+        <div className="grid grid-cols-3 gap-1.5">
           <Button
             variant="ghost"
             size="sm"
@@ -167,6 +171,15 @@ export function Sidebar({
           >
             <Scan className="w-3.5 h-3.5" />
             Scan
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOCRClick}
+            className="h-9 text-slate-400 hover:text-white hover:bg-white/10 justify-start gap-2 text-xs"
+          >
+            <ScanText className="w-3.5 h-3.5" />
+            OCR
           </Button>
           <Button
             variant="ghost"
@@ -207,6 +220,19 @@ export function Sidebar({
           <span>{dark ? 'Light mode' : 'Dark mode'}</span>
         </button>
       </div>
+
+      {/* Install App */}
+      {canInstall && (
+        <div className="px-3 py-1">
+          <button
+            onClick={install}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-all border border-blue-500/20"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Install App</span>
+          </button>
+        </div>
+      )}
 
       {/* Data Management */}
       <div className="px-3 py-3 border-t border-white/5">

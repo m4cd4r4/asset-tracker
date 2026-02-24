@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { storage } from '@/services/storage';
 import { LOCATIONS } from '@/types';
-import { Hash, Search } from 'lucide-react';
+import { Hash, Search, Barcode } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { BarcodeDisplay } from './BarcodeDisplay';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -19,6 +20,7 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
   const [search, setSearch] = useState('');
   const [locationFilter, setLocationFilter] = useState('all');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [barcodeForSAN, setBarcodeForSAN] = useState<string | null>(null);
   const sanRecords = storage.getSANRecords();
 
   const filtered = sanRecords
@@ -106,6 +108,7 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
                   <TableHead className="text-xs">Item</TableHead>
                   <TableHead className="text-xs">Location</TableHead>
                   <TableHead className="text-xs">Date</TableHead>
+                  <TableHead className="text-xs w-8"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -123,6 +126,15 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
                         {date.toLocaleDateString('en-AU')}
+                      </TableCell>
+                      <TableCell className="p-1">
+                        <button
+                          onClick={() => setBarcodeForSAN(record.sanNumber)}
+                          className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+                          title="Show barcode"
+                        >
+                          <Barcode className="w-3.5 h-3.5" />
+                        </button>
                       </TableCell>
                     </TableRow>
                   );
@@ -142,6 +154,14 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
           </div>
         )}
       </DialogContent>
+
+      {barcodeForSAN && (
+        <BarcodeDisplay
+          sanNumber={barcodeForSAN}
+          open={!!barcodeForSAN}
+          onClose={() => setBarcodeForSAN(null)}
+        />
+      )}
     </Dialog>
   );
 }

@@ -46,7 +46,7 @@ export function useBoxCounter(): UseBoxCounter {
         const cocoSsd = window.cocoSsd;
 
         if (!tf || !cocoSsd) {
-          setError('TensorFlow not loaded - box counting unavailable offline');
+          setError('Detection model unavailable. Open the app online first to cache the model.');
           return;
         }
 

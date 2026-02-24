@@ -1,4 +1,4 @@
-import { Menu, Scan, Box, AlertTriangle } from 'lucide-react';
+import { Menu, Scan, Box, ScanText, AlertTriangle } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { LOCATIONS } from '@/types';
 import { Button } from './ui/button';
@@ -8,10 +8,11 @@ interface HeaderProps {
   onMenuClick: () => void;
   onScanClick: () => void;
   onCountClick: () => void;
+  onOCRClick?: () => void;
   onLowStockClick: () => void;
 }
 
-export function Header({ onMenuClick, onScanClick, onCountClick, onLowStockClick }: HeaderProps) {
+export function Header({ onMenuClick, onScanClick, onCountClick, onOCRClick, onLowStockClick }: HeaderProps) {
   const { currentLocation, getLowStockItems } = useStore();
   const lowStockCount = getLowStockItems().length;
   const locationName = LOCATIONS.find(l => l.id === currentLocation)?.name ?? 'Inventory';
@@ -28,6 +29,9 @@ export function Header({ onMenuClick, onScanClick, onCountClick, onLowStockClick
       <div className="flex items-center gap-1">
         <Button variant="ghost" size="icon-sm" onClick={onScanClick}>
           <Scan className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="icon-sm" onClick={onOCRClick}>
+          <ScanText className="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="icon-sm" onClick={onCountClick}>
           <Box className="w-4 h-4" />
