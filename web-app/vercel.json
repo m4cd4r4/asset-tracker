@@ -2,9 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    { "source": "/", "destination": "/landing", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/", "destination": "/landing/index.html" },
-    { "source": "/landing", "destination": "/landing/index.html" },
     { "source": "/app", "destination": "/index.html" },
     { "source": "/app/(.*)", "destination": "/index.html" },
     { "source": "/((?!landing|assets|demo\\.mp4|.*\\..*).+)", "destination": "/index.html" }
