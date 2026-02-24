@@ -5,20 +5,20 @@ export interface Asset {
   lastCount: number;
   newCount: number;
   threshold: number;
-  location: LocationId;
+  location: string;
 }
 
 export interface SANRecord {
   sanNumber: string;
   item: string;
   timestamp: string;
-  location: LocationId;
+  location: string;
 }
 
 export interface SANReturn {
   id: string;
   sanNumber: string;
-  generation: Generation;
+  generation: string;
   returnedBy: string;
   returnedTo: string;
   notes: string;
@@ -32,30 +32,14 @@ export interface TransactionLog {
   action: 'add' | 'subtract';
   sanNumber?: string;
   volume: number;
-  location: LocationId;
+  location: string;
 }
 
-export type LocationId = 'basement-4.2' | 'build-room' | 'darwin' | 'level-17' | 'basement-4.3';
-
-export type Generation = 'G5' | 'G6' | 'G7' | 'G8' | 'G9' | 'G10' | 'G11';
-
 export interface Location {
-  id: LocationId;
+  id: string;
   name: string;
   shortName: string;
 }
-
-export const LOCATIONS: Location[] = [
-  { id: 'basement-4.2', name: 'Basement 4.2', shortName: '4.2' },
-  { id: 'build-room', name: 'Build Room', shortName: 'BR' },
-  { id: 'darwin', name: 'Darwin', shortName: 'DRW' },
-  { id: 'level-17', name: 'Level 17', shortName: 'L17' },
-  { id: 'basement-4.3', name: 'Basement 4.3', shortName: '4.3' },
-];
-
-export const SAN_REQUIRED_ITEMS = ['G8', 'G9', 'G10'];
-
-export const GENERATIONS: Generation[] = ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11'];
 
 // Barcode scanning types
 export interface ScanResult {
@@ -81,7 +65,7 @@ export interface BoundingBox {
 
 // App state
 export interface AppState {
-  currentLocation: LocationId;
+  currentLocation: string;
   assets: Asset[];
   sanRecords: SANRecord[];
   sanReturns: SANReturn[];

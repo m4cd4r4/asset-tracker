@@ -34,6 +34,15 @@ Thumbs.db
 # Testing
 coverage/
 
+# E2E test artifacts (keep readme screenshots tracked)
+e2e/results/.last-run.json
+e2e/results/full-inspection-*/
+e2e/results/settings-*/
+e2e/results/setup-wizard-*/
+e2e/results/v2-features-*/
+e2e/results/readme-screenshots-*/
+e2e/results/[0-9]*.png
+
 # Misc
 *.log
 .cache/

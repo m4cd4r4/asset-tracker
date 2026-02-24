@@ -1,103 +1,242 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '@/store/useStore';
+import { useWorkspace } from '@/hooks/useWorkspace';
+import { workspace } from '@/services/workspace';
+import { PERTH_IT_PRESET } from '@/data/presets';
 import { Header } from '@/components/Header';
-import { LocationSelector } from '@/components/LocationSelector';
+import { Sidebar } from '@/components/Sidebar';
+import { KPICards } from '@/components/KPICards';
 import { InventoryTable } from '@/components/InventoryTable';
+import { InventoryChart } from '@/components/InventoryChart';
 import { TransactionLog } from '@/components/TransactionLog';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { BarcodeScanner } from '@/components/BarcodeScanner';
+import { BoxCounter } from '@/components/BoxCounter';
+import { OCRScanner } from '@/components/OCRScanner';
+import { LowStockDialog } from '@/components/LowStockDialog';
+import { SANListDialog } from '@/components/SANListDialog';
+import { SANReturnModal } from '@/components/SANReturnModal';
+import { SetupWizard } from '@/components/SetupWizard';
+import { AddAssetDialog } from '@/components/AddAssetDialog';
+import { SettingsPanel } from '@/components/settings/SettingsPanel';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 function App() {
   const { loadData, isLoading } = useStore();
-  const [showLog, setShowLog] = useState(true);
+  const ws = useWorkspace();
+
+  const [activeView, setActiveView] = useState('inventory');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [showBoxCounter, setShowBoxCounter] = useState(false);
+  const [showLowStock, setShowLowStock] = useState(false);
+  const [showSANList, setShowSANList] = useState(false);
+  const [showSANReturn, setShowSANReturn] = useState(false);
+  const [showOCR, setShowOCR] = useState(false);
+  const [showAddAsset, setShowAddAsset] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [quickCount, setQuickCount] = useState<number | null>(null);
 
   useEffect(() => {
-    loadData();
+    ws.init();
+
+    // Auto-migrate legacy data
+    if (!workspace.hasConfig() && workspace.hasLegacyData()) {
+      workspace.migrateFromLegacy(PERTH_IT_PRESET.config);
+      ws.init();
+    }
   }, []);
 
+  useEffect(() => {
+    if (ws.config) loadData();
+  }, [ws.config]);
+
+  const handleSetupComplete = () => {
+    ws.init();
+    loadData();
+  };
+
   const handleScanResult = (code: string) => {
+    setShowScanner(false);
     setScannedCode(code);
-    // Auto-dismiss after 5 seconds
     setTimeout(() => setScannedCode(null), 5000);
   };
 
   const handleBoxCount = (count: number) => {
+    setShowBoxCounter(false);
     setQuickCount(count);
-    // Auto-dismiss after 10 seconds
     setTimeout(() => setQuickCount(null), 10000);
   };
 
-  if (isLoading) {
+  const handleOCRScan = (san: string) => {
+    setShowOCR(false);
+    setScannedCode(san);
+    setTimeout(() => setScannedCode(null), 5000);
+  };
+
+  // Show setup wizard if no workspace config
+  if (ws.isReady && !ws.config) {
+    return <SetupWizard onComplete={handleSetupComplete} />;
+  }
+
+  if (!ws.isReady || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading inventory...</p>
+      <div className="min-h-screen bg-mesh flex items-center justify-center">
+        <div className="text-center glass-card rounded-2xl p-8">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground text-sm">Loading inventory...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header onScanResult={handleScanResult} onBoxCount={handleBoxCount} />
+    <TooltipProvider>
+      <div className="min-h-screen bg-mesh flex">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:flex w-56 shrink-0 glass-card-dark border-r border-white/5 flex-col">
+          <Sidebar
+            activeView={activeView}
+            onViewChange={setActiveView}
+            onScanClick={() => setShowScanner(true)}
+            onCountClick={() => setShowBoxCounter(true)}
+            onOCRClick={() => setShowOCR(true)}
+            onLowStockClick={() => setShowLowStock(true)}
+            onSANListClick={() => setShowSANList(true)}
+          />
+        </aside>
 
-      {/* Scanned Code Banner */}
-      {scannedCode && (
-        <div className="bg-green-500 text-white px-4 py-2 flex items-center justify-between">
-          <span>
-            Scanned: <strong className="font-mono">{scannedCode}</strong>
-          </span>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(scannedCode);
-            }}
-            className="text-sm bg-white/20 px-2 py-1 rounded"
-          >
-            Copy
-          </button>
+        {/* Mobile Sidebar Sheet */}
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-64 p-0">
+            <SheetTitle className="sr-only">Navigation</SheetTitle>
+            <SheetDescription className="sr-only">App navigation and controls</SheetDescription>
+            <Sidebar
+              activeView={activeView}
+              onViewChange={(v) => { setActiveView(v); setSidebarOpen(false); }}
+              onLocationChange={() => setSidebarOpen(false)}
+              onScanClick={() => { setShowScanner(true); setSidebarOpen(false); }}
+              onCountClick={() => { setShowBoxCounter(true); setSidebarOpen(false); }}
+              onOCRClick={() => { setShowOCR(true); setSidebarOpen(false); }}
+              onLowStockClick={() => { setShowLowStock(true); setSidebarOpen(false); }}
+              onSANListClick={() => { setShowSANList(true); setSidebarOpen(false); }}
+            />
+          </SheetContent>
+        </Sheet>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+          {/* Mobile Header */}
+          <Header
+            onMenuClick={() => setSidebarOpen(true)}
+            onScanClick={() => setShowScanner(true)}
+            onCountClick={() => setShowBoxCounter(true)}
+            onOCRClick={() => setShowOCR(true)}
+            onLowStockClick={() => setShowLowStock(true)}
+          />
+
+          {/* Toast Notifications */}
+          <div className="fixed top-4 right-4 z-40 flex flex-col gap-2 md:top-6 md:right-6">
+            {scannedCode && (
+              <div className="glass-card rounded-lg px-4 py-3 flex items-center gap-3 animate-slide-in-right shadow-lg max-w-xs">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">Scanned</p>
+                  <p className="text-sm font-mono font-medium truncate">{scannedCode}</p>
+                </div>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(scannedCode); }}
+                  className="text-xs text-blue-500 hover:text-blue-600 font-medium shrink-0"
+                >
+                  Copy
+                </button>
+              </div>
+            )}
+            {quickCount !== null && (
+              <div className="glass-card rounded-lg px-4 py-3 flex items-center gap-3 animate-slide-in-right shadow-lg">
+                <div className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Quick Count</p>
+                  <p className="text-lg font-bold tabular-nums">{quickCount} items</p>
+                </div>
+                <button
+                  onClick={() => setQuickCount(null)}
+                  className="text-xs text-muted-foreground hover:text-foreground shrink-0"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Page Content */}
+          <main className="flex-1 overflow-auto p-4 md:p-6 space-y-4">
+            {activeView === 'inventory' && (
+              <>
+                <KPICards />
+                <InventoryTable
+                  onReturnSAN={() => setShowSANReturn(true)}
+                  onAddAsset={() => setShowAddAsset(true)}
+                />
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                  <div className="lg:col-span-3">
+                    <InventoryChart />
+                  </div>
+                  <div className="lg:col-span-2">
+                    <TransactionLog />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeView === 'activity' && (
+              <div className="max-w-3xl">
+                <TransactionLog />
+              </div>
+            )}
+
+            {activeView === 'reports' && (
+              <div className="max-w-4xl space-y-4">
+                <InventoryChart />
+                <KPICards />
+              </div>
+            )}
+
+            {activeView === 'settings' && (
+              <SettingsPanel />
+            )}
+          </main>
         </div>
-      )}
 
-      {/* Quick Count Banner */}
-      {quickCount !== null && (
-        <div className="bg-blue-500 text-white px-4 py-2 flex items-center justify-between">
-          <span>
-            Quick Count: <strong className="text-xl">{quickCount}</strong> items detected
-          </span>
-          <button
-            onClick={() => setQuickCount(null)}
-            className="text-sm bg-white/20 px-2 py-1 rounded"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
+        {/* Modals */}
+        {showScanner && (
+          <BarcodeScanner
+            onScan={handleScanResult}
+            onClose={() => setShowScanner(false)}
+            title="Scan Barcode"
+          />
+        )}
 
-      <LocationSelector />
+        {showBoxCounter && (
+          <BoxCounter
+            onCount={handleBoxCount}
+            onClose={() => setShowBoxCounter(false)}
+          />
+        )}
 
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Inventory Section */}
-        <div className="flex-1 overflow-auto">
-          <InventoryTable />
-        </div>
+        {showOCR && (
+          <OCRScanner
+            onScanSAN={handleOCRScan}
+            onClose={() => setShowOCR(false)}
+          />
+        )}
 
-        {/* Transaction Log Section */}
-        <div className="border-t bg-white">
-          <button
-            onClick={() => setShowLog(!showLog)}
-            className="w-full px-4 py-2 flex items-center justify-between text-sm font-medium text-gray-600 hover:bg-gray-50"
-          >
-            <span>Transaction Log</span>
-            {showLog ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-          </button>
-          {showLog && <TransactionLog />}
-        </div>
-      </main>
-
-      {/* PWA Install Prompt would go here */}
-    </div>
+        <LowStockDialog open={showLowStock} onClose={() => setShowLowStock(false)} />
+        <SANListDialog open={showSANList} onClose={() => setShowSANList(false)} />
+        <SANReturnModal open={showSANReturn} onClose={() => setShowSANReturn(false)} />
+        <AddAssetDialog open={showAddAsset} onClose={() => setShowAddAsset(false)} />
+      </div>
+    </TooltipProvider>
   );
 }
 
