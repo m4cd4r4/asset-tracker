@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import type { Asset, SANRecord, SANReturn, TransactionLog, LocationId } from '@/types';
+import type { Asset, SANRecord, SANReturn, TransactionLog } from '@/types';
 import { storage } from '@/services/storage';
+import { workspace } from '@/services/workspace';
 
 interface Store {
   // State
-  currentLocation: LocationId;
+  currentLocation: string;
   assets: Asset[];
   sanRecords: SANRecord[];
   sanReturns: SANReturn[];
@@ -13,7 +14,7 @@ interface Store {
   error: string | null;
 
   // Actions
-  setLocation: (location: LocationId) => void;
+  setLocation: (location: string) => void;
   loadData: () => void;
 
   // Inventory actions
@@ -26,6 +27,8 @@ interface Store {
 
   updateThreshold: (assetId: string, threshold: number) => void;
 
+  addAsset: (item: string, location: string, threshold?: number) => Asset;
+
   // SAN actions
   addSANReturn: (data: Omit<SANReturn, 'id' | 'timestamp'>) => SANReturn;
 
@@ -35,7 +38,7 @@ interface Store {
 }
 
 export const useStore = create<Store>((set, get) => ({
-  currentLocation: 'basement-4.2',
+  currentLocation: '',
   assets: [],
   sanRecords: [],
   sanReturns: [],
@@ -51,7 +54,15 @@ export const useStore = create<Store>((set, get) => ({
   loadData: () => {
     set({ isLoading: true, error: null });
     try {
-      const { currentLocation } = get();
+      let { currentLocation } = get();
+
+      // Default to first location from workspace config if unset
+      if (!currentLocation) {
+        const locations = workspace.getLocations();
+        currentLocation = locations[0]?.id ?? '';
+        set({ currentLocation });
+      }
+
       const assets = storage.getAssets(currentLocation);
       const sanRecords = storage.getSANRecords();
       const sanReturns = storage.getSANReturns();
@@ -80,25 +91,24 @@ export const useStore = create<Store>((set, get) => ({
       return { success: false, error: 'Asset not found' };
     }
 
-    // Check if SAN is required for this item
-    const sanRequired = ['G8', 'G9', 'G10'].includes(asset.item);
+    const sanRequired = workspace.requiresAssetNumber(asset.item);
 
     if (sanRequired && operation === 'add') {
       if (!sanNumbers || sanNumbers.length !== quantity) {
-        return { success: false, error: `Please provide ${quantity} SAN number(s)` };
+        const displayName = workspace.getAssetNumberConfig().displayName;
+        return { success: false, error: `Please provide ${quantity} ${displayName} number(s)` };
       }
 
-      // Validate all SANs are unique
       for (const san of sanNumbers) {
         if (!storage.isSANUnique(san)) {
-          return { success: false, error: `SAN ${san} already exists in system` };
+          return { success: false, error: `${san} already exists in system` };
         }
-        if (!/^\d{5,6}$/.test(san)) {
-          return { success: false, error: `SAN ${san} must be 5-6 digits` };
+        if (!workspace.validateAssetNumber(san)) {
+          const { description } = workspace.getAssetNumberConfig();
+          return { success: false, error: `${san} is invalid (${description})` };
         }
       }
 
-      // Add SAN records
       for (const san of sanNumbers) {
         storage.addSANRecord({
           sanNumber: san,
@@ -111,28 +121,26 @@ export const useStore = create<Store>((set, get) => ({
 
     if (sanRequired && operation === 'subtract') {
       if (!sanNumbers || sanNumbers.length !== quantity) {
-        return { success: false, error: `Please provide ${quantity} SAN number(s) to remove` };
+        const displayName = workspace.getAssetNumberConfig().displayName;
+        return { success: false, error: `Please provide ${quantity} ${displayName} number(s) to remove` };
       }
 
-      // Validate SANs exist and match item type
       const existingSANs = storage.getSANRecords();
       for (const san of sanNumbers) {
         const record = existingSANs.find(r => r.sanNumber === san);
         if (!record) {
-          return { success: false, error: `SAN ${san} not found in system` };
+          return { success: false, error: `${san} not found in system` };
         }
         if (record.item !== asset.item) {
-          return { success: false, error: `SAN ${san} belongs to ${record.item}, not ${asset.item}` };
+          return { success: false, error: `${san} belongs to ${record.item}, not ${asset.item}` };
         }
       }
 
-      // Remove SAN records
       for (const san of sanNumbers) {
         storage.removeSANRecord(san);
       }
     }
 
-    // Update asset count
     const newCount = operation === 'add'
       ? asset.newCount + quantity
       : Math.max(0, asset.newCount - quantity);
@@ -145,7 +153,6 @@ export const useStore = create<Store>((set, get) => ({
 
     storage.updateAsset(updatedAsset);
 
-    // Log transaction
     storage.addTransaction({
       item: asset.item,
       action: operation,
@@ -154,9 +161,7 @@ export const useStore = create<Store>((set, get) => ({
       sanNumber: sanNumbers?.join(', '),
     });
 
-    // Reload data
     get().loadData();
-
     return { success: true };
   },
 
@@ -167,6 +172,20 @@ export const useStore = create<Store>((set, get) => ({
       storage.updateAsset({ ...asset, threshold });
       get().loadData();
     }
+  },
+
+  addAsset: (item, location, threshold = 10) => {
+    const asset: Asset = {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      item,
+      lastCount: 0,
+      newCount: 0,
+      threshold,
+      location,
+    };
+    storage.updateAsset(asset);
+    get().loadData();
+    return asset;
   },
 
   addSANReturn: (data) => {

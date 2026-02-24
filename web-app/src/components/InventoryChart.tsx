@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
 import { useStore } from '@/store/useStore';
-import { LOCATIONS } from '@/types';
+import { useWorkspace } from '@/hooks/useWorkspace';
 
 function TruncatedTick({ x, y, payload }: { x: number; y: number; payload: { value: string } }) {
   const label = payload.value.length > 14
@@ -18,6 +18,7 @@ function TruncatedTick({ x, y, payload }: { x: number; y: number; payload: { val
 
 export function InventoryChart() {
   const { assets, currentLocation } = useStore();
+  const { findLocation } = useWorkspace();
 
   const data = assets.map(a => ({
     name: a.item,
@@ -26,7 +27,7 @@ export function InventoryChart() {
     isLow: a.newCount < a.threshold,
   }));
 
-  const locationName = LOCATIONS.find(l => l.id === currentLocation)?.name ?? currentLocation;
+  const locationName = findLocation(currentLocation)?.name ?? currentLocation;
   const avgThreshold = data.length > 0
     ? Math.round(data.reduce((sum, d) => sum + d.threshold, 0) / data.length)
     : 10;

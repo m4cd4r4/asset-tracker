@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '@/store/useStore';
+import { useWorkspace } from '@/hooks/useWorkspace';
+import { workspace } from '@/services/workspace';
+import { PERTH_IT_PRESET } from '@/data/presets';
 import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { KPICards } from '@/components/KPICards';
@@ -12,11 +15,15 @@ import { OCRScanner } from '@/components/OCRScanner';
 import { LowStockDialog } from '@/components/LowStockDialog';
 import { SANListDialog } from '@/components/SANListDialog';
 import { SANReturnModal } from '@/components/SANReturnModal';
+import { SetupWizard } from '@/components/SetupWizard';
+import { AddAssetDialog } from '@/components/AddAssetDialog';
+import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 function App() {
   const { loadData, isLoading } = useStore();
+  const ws = useWorkspace();
 
   const [activeView, setActiveView] = useState('inventory');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,10 +33,28 @@ function App() {
   const [showSANList, setShowSANList] = useState(false);
   const [showSANReturn, setShowSANReturn] = useState(false);
   const [showOCR, setShowOCR] = useState(false);
+  const [showAddAsset, setShowAddAsset] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [quickCount, setQuickCount] = useState<number | null>(null);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    ws.init();
+
+    // Auto-migrate legacy data
+    if (!workspace.hasConfig() && workspace.hasLegacyData()) {
+      workspace.migrateFromLegacy(PERTH_IT_PRESET.config);
+      ws.init();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (ws.config) loadData();
+  }, [ws.config]);
+
+  const handleSetupComplete = () => {
+    ws.init();
+    loadData();
+  };
 
   const handleScanResult = (code: string) => {
     setShowScanner(false);
@@ -49,7 +74,12 @@ function App() {
     setTimeout(() => setScannedCode(null), 5000);
   };
 
-  if (isLoading) {
+  // Show setup wizard if no workspace config
+  if (ws.isReady && !ws.config) {
+    return <SetupWizard onComplete={handleSetupComplete} />;
+  }
+
+  if (!ws.isReady || isLoading) {
     return (
       <div className="min-h-screen bg-mesh flex items-center justify-center">
         <div className="text-center glass-card rounded-2xl p-8">
@@ -144,7 +174,10 @@ function App() {
             {activeView === 'inventory' && (
               <>
                 <KPICards />
-                <InventoryTable onReturnSAN={() => setShowSANReturn(true)} />
+                <InventoryTable
+                  onReturnSAN={() => setShowSANReturn(true)}
+                  onAddAsset={() => setShowAddAsset(true)}
+                />
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                   <div className="lg:col-span-3">
                     <InventoryChart />
@@ -168,6 +201,10 @@ function App() {
                 <KPICards />
               </div>
             )}
+
+            {activeView === 'settings' && (
+              <SettingsPanel />
+            )}
           </main>
         </div>
 
@@ -176,7 +213,7 @@ function App() {
           <BarcodeScanner
             onScan={handleScanResult}
             onClose={() => setShowScanner(false)}
-            title="Scan SAN Barcode"
+            title="Scan Barcode"
           />
         )}
 
@@ -197,6 +234,7 @@ function App() {
         <LowStockDialog open={showLowStock} onClose={() => setShowLowStock(false)} />
         <SANListDialog open={showSANList} onClose={() => setShowSANList(false)} />
         <SANReturnModal open={showSANReturn} onClose={() => setShowSANReturn(false)} />
+        <AddAssetDialog open={showAddAsset} onClose={() => setShowAddAsset(false)} />
       </div>
     </TooltipProvider>
   );

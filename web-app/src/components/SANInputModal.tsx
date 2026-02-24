@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { storage } from '@/services/storage';
+import { workspace } from '@/services/workspace';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -17,12 +18,13 @@ interface SANInputModalProps {
 export function SANInputModal({ quantity, operation, itemName, onSubmit, onCancel }: SANInputModalProps) {
   const [sanNumbers, setSanNumbers] = useState<string[]>(Array(quantity).fill(''));
   const [errors, setErrors] = useState<string[]>(Array(quantity).fill(''));
+  const anConfig = workspace.getAssetNumberConfig();
 
   const validateSAN = (san: string, index: number): boolean => {
     const newErrors = [...errors];
 
-    if (!/^\d{5,6}$/.test(san)) {
-      newErrors[index] = 'Must be 5-6 digits';
+    if (!workspace.validateAssetNumber(san)) {
+      newErrors[index] = anConfig.description;
       setErrors(newErrors);
       return false;
     }
@@ -49,7 +51,7 @@ export function SANInputModal({ quantity, operation, itemName, onSubmit, onCance
     }
 
     if (sanNumbers.filter((s, i) => s === san && i !== index).length > 0) {
-      newErrors[index] = 'Duplicate SAN';
+      newErrors[index] = `Duplicate ${anConfig.displayName}`;
       setErrors(newErrors);
       return false;
     }
@@ -60,12 +62,12 @@ export function SANInputModal({ quantity, operation, itemName, onSubmit, onCance
   };
 
   const handleChange = (index: number, value: string) => {
-    const cleaned = value.replace(/\D/g, '').slice(0, 6);
+    const cleaned = value.trim().slice(0, 20);
     const newSanNumbers = [...sanNumbers];
     newSanNumbers[index] = cleaned;
     setSanNumbers(newSanNumbers);
 
-    if (cleaned.length >= 5) {
+    if (cleaned.length >= 3) {
       validateSAN(cleaned, index);
     } else {
       const newErrors = [...errors];
@@ -85,7 +87,7 @@ export function SANInputModal({ quantity, operation, itemName, onSubmit, onCance
     }
   };
 
-  const allFilled = sanNumbers.every(san => san.length >= 5);
+  const allFilled = sanNumbers.every(san => san.length >= 3);
   const hasErrors = errors.some(e => e !== '');
 
   return (
@@ -96,7 +98,7 @@ export function SANInputModal({ quantity, operation, itemName, onSubmit, onCance
             {operation === 'add' ? 'Add' : 'Remove'} {itemName}
           </DialogTitle>
           <DialogDescription>
-            Enter {quantity} SAN number{quantity > 1 ? 's' : ''} (5-6 digits each)
+            Enter {quantity} {anConfig.displayName} number{quantity > 1 ? 's' : ''} ({anConfig.description})
           </DialogDescription>
         </DialogHeader>
 
@@ -112,14 +114,14 @@ export function SANInputModal({ quantity, operation, itemName, onSubmit, onCance
                   pattern="[0-9]*"
                   value={san}
                   onChange={(e) => handleChange(index, e.target.value)}
-                  placeholder="Enter SAN"
+                  placeholder={anConfig.placeholder}
                   className={cn(
                     'h-9',
                     errors[index] && 'border-rose-300 bg-rose-50 focus-visible:ring-rose-400'
                   )}
                   autoFocus={index === 0}
                 />
-                {san.length >= 5 && !errors[index] && (
+                {san.length >= 3 && !errors[index] && (
                   <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                     <Check className="w-3 h-3 text-emerald-600" />
                   </div>

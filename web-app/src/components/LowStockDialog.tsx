@@ -1,5 +1,5 @@
 import { useStore } from '@/store/useStore';
-import { LOCATIONS } from '@/types';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { AlertTriangle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Badge } from './ui/badge';
@@ -12,6 +12,7 @@ interface LowStockDialogProps {
 
 export function LowStockDialog({ open, onClose }: LowStockDialogProps) {
   const { getLowStockItems } = useStore();
+  const { findLocation } = useWorkspace();
   const lowStockItems = getLowStockItems();
 
   return (
@@ -46,7 +47,7 @@ export function LowStockDialog({ open, onClose }: LowStockDialogProps) {
               </TableHeader>
               <TableBody>
                 {lowStockItems.map(item => {
-                  const loc = LOCATIONS.find(l => l.id === item.location);
+                  const loc = findLocation(item.location);
                   return (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium text-sm">{item.item}</TableCell>

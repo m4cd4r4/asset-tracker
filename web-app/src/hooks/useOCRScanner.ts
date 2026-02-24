@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createWorker, Worker } from 'tesseract.js';
+import { workspace } from '@/services/workspace';
 
 interface OCRResult {
   text: string;
@@ -7,8 +8,6 @@ interface OCRResult {
   confidence: number;
   processingTime: number;
 }
-
-const SAN_PATTERN = /\b(\d{5,6})\b/g;
 
 export function useOCRScanner() {
   const [isReady, setIsReady] = useState(false);
@@ -70,7 +69,7 @@ export function useOCRScanner() {
       const { data } = await workerRef.current.recognize(source);
       const result: OCRResult = {
         text: data.text,
-        sanNumbers: [...new Set(data.text.match(SAN_PATTERN) || [])],
+        sanNumbers: [...new Set(data.text.match(new RegExp(workspace.getAssetNumberConfig().ocrPattern, 'g')) || [])],
         confidence: data.confidence,
         processingTime: Date.now() - startTime,
       };

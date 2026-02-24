@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EUC Asset Tracker — Real-time IT inventory for Western Australia</title>
+  <meta name="description" content="Track end-user compute assets across five WA sites with OCR scanning, barcode generation, AI box counting, and full offline support. No server required.">
+  <meta property="og:title" content="EUC Asset Tracker">
+  <meta property="og:description" content="Real-time IT asset tracking PWA with browser ML. OCR, barcodes, box counting — works offline.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Fonts: Geist (Bento Grid preset) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1/dist/fonts/geist-sans/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1/dist/fonts/geist-mono/style.css">
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="../public/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <div class="nav-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <span class="nav-title">EUC Asset Tracker</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#demo">Demo</a>
+        <a href="#tech">Stack</a>
+        <a href="https://github.com/m4cd4r4/Asset-Tracker-v2" target="_blank" rel="noopener" class="nav-github">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-grid-bg" aria-hidden="true"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          PWA &middot; Works Offline &middot; No Server
+        </div>
+        <h1 class="hero-title">
+          Track every asset.<br>
+          <span class="hero-accent">Scan any label.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Real-time end-user compute inventory across five Western Australia sites.
+          OCR text recognition, barcode generation, and AI box counting &mdash;
+          all running in the browser.
+        </p>
+        <div class="hero-cta">
+          <a href="#demo" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            View Live Demo
+          </a>
+          <a href="#features" class="btn btn-secondary">Learn More</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-value">5</span>
+            <span class="stat-label">WA Sites</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value">&lt;5ms</span>
+            <span class="stat-label">Scan Speed</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value">100%</span>
+            <span class="stat-label">Offline</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value">0</span>
+            <span class="stat-label">Servers</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-app-frame">
+          <div class="frame-chrome">
+            <span class="chrome-dot red"></span>
+            <span class="chrome-dot yellow"></span>
+            <span class="chrome-dot green"></span>
+            <span class="chrome-url">euc-asset-tracker.app</span>
+          </div>
+          <img src="../e2e/results/readme-dark.png" alt="EUC Asset Tracker dashboard in dark mode showing inventory table, KPI cards, and glassmorphism UI" class="hero-screenshot" loading="eager" width="1280" height="800">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem / Solution -->
+  <section class="problem-solution">
+    <div class="container">
+      <div class="ps-grid">
+        <div class="ps-card ps-problem">
+          <div class="ps-icon problem-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h3>Without a tracker</h3>
+          <ul>
+            <li>Spreadsheets emailed between five offices</li>
+            <li>Manual counts take 2+ hours per site</li>
+            <li>SAN stickers transcribed by hand — errors</li>
+            <li>No visibility into low-stock until it's too late</li>
+            <li>New hires can't find which room has G10 docks</li>
+          </ul>
+        </div>
+        <div class="ps-card ps-solution">
+          <div class="ps-icon solution-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>With EUC Asset Tracker</h3>
+          <ul>
+            <li>One shared PWA — install on any phone</li>
+            <li>Point camera at SAN label, OCR reads it instantly</li>
+            <li>Generate Code 128 + QR barcodes from any SAN</li>
+            <li>Low-stock alerts fire automatically per location</li>
+            <li>AI counts boxes in seconds from a single photo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bento Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything you need to manage EUC inventory</h2>
+        <p>Browser-native ML means no cloud dependencies — scan, count, and generate barcodes entirely offline.</p>
+      </div>
+      <div class="bento">
+        <!-- OCR — wide tile -->
+        <div class="bento-tile span-2x1" data-feature="ocr">
+          <div class="tile-content">
+            <div class="tile-icon blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/><path d="M7 12h10"/></svg>
+            </div>
+            <h3>OCR Text Recognition</h3>
+            <p>Point your camera at a SAN sticker and the Tesseract.js engine reads the serial number. Works with printed labels, handwritten numbers, and low-contrast stickers. Camera or image upload.</p>
+            <div class="tile-tag">Tesseract.js WASM</div>
+          </div>
+          <div class="tile-visual ocr-visual">
+            <div class="ocr-mockup">
+              <div class="ocr-viewfinder">
+                <div class="vf-corner tl"></div>
+                <div class="vf-corner tr"></div>
+                <div class="vf-corner bl"></div>
+                <div class="vf-corner br"></div>
+                <span class="vf-label">SAN-084721</span>
+              </div>
+              <div class="ocr-result">
+                <span class="result-dot"></span>
+                Found: <strong>084721</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barcode Generation -->
+        <div class="bento-tile" data-feature="barcode">
+          <div class="tile-content">
+            <div class="tile-icon amber">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14"/><path d="M8 5v14"/><path d="M12 5v14"/><path d="M17 5v14"/><path d="M21 5v14"/></svg>
+            </div>
+            <h3>Barcode Generation</h3>
+            <p>Generate Code 128 barcodes and QR codes from any SAN. Download as PNG or copy to clipboard.</p>
+            <div class="tile-tag">JsBarcode + QRCode</div>
+          </div>
+        </div>
+
+        <!-- AI Box Counting -->
+        <div class="bento-tile" data-feature="boxes">
+          <div class="tile-content">
+            <div class="tile-icon emerald">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <h3>AI Box Counting</h3>
+            <p>COCO-SSD object detection counts stacked boxes from a single photo. No manual tallying.</p>
+            <div class="tile-tag">TensorFlow.js</div>
+          </div>
+        </div>
+
+        <!-- Multi-Location -->
+        <div class="bento-tile" data-feature="locations">
+          <div class="tile-content">
+            <div class="tile-icon violet">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <h3>5 WA Locations</h3>
+            <p>Basement 4.2, Build Room, Darwin, Level 17, Basement 4.3 — switch instantly, see per-site stock.</p>
+          </div>
+        </div>
+
+        <!-- SAN Registry -->
+        <div class="bento-tile" data-feature="san">
+          <div class="tile-content">
+            <div class="tile-icon rose">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+            </div>
+            <h3>SAN Registry</h3>
+            <p>Full audit trail of every serial asset number. Search, filter by location, generate barcodes per row.</p>
+          </div>
+        </div>
+
+        <!-- Offline PWA — wide tile -->
+        <div class="bento-tile span-2x1" data-feature="pwa">
+          <div class="tile-content">
+            <div class="tile-icon slate">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18h.01"/><path d="M9.172 15.172a4 4 0 0 1 5.656 0"/><path d="M6.343 12.343a8 8 0 0 1 11.314 0"/><path d="M3.515 9.515c4.686-4.687 12.284-4.687 16.97 0"/></svg>
+            </div>
+            <h3>Offline-First PWA</h3>
+            <p>Install on your phone and work without internet. Service worker caches the entire app, ML models, and OCR language data. Workbox runtime caching ensures models stay fresh. First visit warms the cache — every visit after that is instant.</p>
+            <div class="tile-tags">
+              <div class="tile-tag">Workbox</div>
+              <div class="tile-tag">CacheFirst</div>
+              <div class="tile-tag">vite-plugin-pwa</div>
+            </div>
+          </div>
+          <div class="tile-visual pwa-visual">
+            <div class="pwa-cache-diagram">
+              <div class="cache-layer">
+                <span class="cache-label">App Shell</span>
+                <div class="cache-bar" style="--w: 95%"></div>
+              </div>
+              <div class="cache-layer">
+                <span class="cache-label">ML Models</span>
+                <div class="cache-bar amber-bar" style="--w: 80%"></div>
+              </div>
+              <div class="cache-layer">
+                <span class="cache-label">OCR Data</span>
+                <div class="cache-bar blue-bar" style="--w: 70%"></div>
+              </div>
+              <div class="cache-layer">
+                <span class="cache-label">Fonts</span>
+                <div class="cache-bar green-bar" style="--w: 60%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Low Stock Alerts -->
+        <div class="bento-tile" data-feature="alerts">
+          <div class="tile-content">
+            <div class="tile-icon orange">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3>Low Stock Alerts</h3>
+            <p>Set per-item thresholds. Badge count and dialog show exactly what needs reordering.</p>
+          </div>
+        </div>
+
+        <!-- Reports & Charts -->
+        <div class="bento-tile" data-feature="reports">
+          <div class="tile-content">
+            <div class="tile-icon cyan">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <h3>Reports &amp; Charts</h3>
+            <p>Inventory charts, transaction logs, KPI cards. Filter by add/subtract. Export data as JSON.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Demo -->
+  <section class="demo" id="demo">
+    <div class="container">
+      <div class="section-header">
+        <h2>See it in action</h2>
+        <p>The full app running in your browser. Try switching locations, sorting columns, or opening the SAN Registry.</p>
+      </div>
+      <div class="demo-frame">
+        <div class="frame-chrome">
+          <div class="chrome-dots">
+            <span class="chrome-dot red"></span>
+            <span class="chrome-dot yellow"></span>
+            <span class="chrome-dot green"></span>
+          </div>
+          <span class="chrome-url-bar">euc-asset-tracker.app</span>
+          <a href="../index.html" target="_blank" class="chrome-external" title="Open in new tab">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+        <iframe src="../index.html" title="EUC Asset Tracker Live Demo" loading="lazy" allow="camera; fullscreen"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots -->
+  <section class="screenshots">
+    <div class="container">
+      <div class="section-header">
+        <h2>Light &amp; dark themes</h2>
+        <p>Glassmorphism UI with frosted panels, gradient meshes, and smooth transitions.</p>
+      </div>
+      <div class="screenshot-grid">
+        <div class="screenshot-card">
+          <img src="../e2e/results/readme-light.png" alt="Light mode dashboard showing Build Room inventory with KPI cards, sortable table, and chart" loading="lazy" width="1280" height="800">
+          <span class="screenshot-label">Light Mode &mdash; Build Room</span>
+        </div>
+        <div class="screenshot-card">
+          <img src="../e2e/results/readme-dark.png" alt="Dark mode dashboard with glassmorphism panels and blue accent colors" loading="lazy" width="1280" height="800">
+          <span class="screenshot-label">Dark Mode &mdash; Build Room</span>
+        </div>
+        <div class="screenshot-card">
+          <img src="../e2e/results/readme-chart.png" alt="Inventory chart and activity feed section of the dashboard" loading="lazy" width="1280" height="800">
+          <span class="screenshot-label">Charts &amp; Activity Log</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section class="tech" id="tech">
+    <div class="container">
+      <div class="section-header">
+        <h2>Built with modern tech</h2>
+        <p>Zero backend. Everything runs in the browser with localStorage persistence.</p>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="tech-icon-wrap react">R</div>
+          <span class="tech-name">React 18</span>
+          <span class="tech-desc">UI framework</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap ts">TS</div>
+          <span class="tech-name">TypeScript</span>
+          <span class="tech-desc">Type safety</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap vite">V</div>
+          <span class="tech-name">Vite 6</span>
+          <span class="tech-desc">Build tool</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap tw">TW</div>
+          <span class="tech-name">Tailwind CSS</span>
+          <span class="tech-desc">Utility-first CSS</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap zustand">Z</div>
+          <span class="tech-name">Zustand</span>
+          <span class="tech-desc">State management</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap tf">TF</div>
+          <span class="tech-name">TensorFlow.js</span>
+          <span class="tech-desc">Box counting</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap tess">Te</div>
+          <span class="tech-name">Tesseract.js</span>
+          <span class="tech-desc">OCR engine</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap zxing">Zx</div>
+          <span class="tech-name">ZXing</span>
+          <span class="tech-desc">Barcode scanning</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap pwa">PW</div>
+          <span class="tech-name">Workbox PWA</span>
+          <span class="tech-desc">Offline cache</span>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon-wrap pw">Pw</div>
+          <span class="tech-name">Playwright</span>
+          <span class="tech-desc">63 E2E tests</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <div class="cta-card">
+        <h2>Ready to track assets?</h2>
+        <p>Install the PWA on your phone and start scanning. No accounts, no servers, no subscription. Just open and go.</p>
+        <div class="cta-buttons">
+          <a href="../index.html" class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Open App
+          </a>
+          <a href="https://github.com/m4cd4r4/Asset-Tracker-v2" target="_blank" rel="noopener" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <p>EUC Asset Tracker &mdash; Built for IT teams in Western Australia</p>
+        <p class="footer-meta">React 18 &middot; TypeScript &middot; Vite 6 &middot; Tailwind CSS &middot; TensorFlow.js &middot; Tesseract.js</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Intersection Observer for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.bento-tile, .ps-card, .screenshot-card, .tech-item, .section-header').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Nav background on scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('nav-scrolled', window.scrollY > 40);
+    }, { passive: true });
+  </script>
+</body>
+</html>

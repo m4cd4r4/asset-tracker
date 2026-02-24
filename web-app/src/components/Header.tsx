@@ -1,6 +1,6 @@
 import { Menu, Scan, Box, ScanText, AlertTriangle } from 'lucide-react';
 import { useStore } from '@/store/useStore';
-import { LOCATIONS } from '@/types';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 
@@ -14,8 +14,9 @@ interface HeaderProps {
 
 export function Header({ onMenuClick, onScanClick, onCountClick, onOCRClick, onLowStockClick }: HeaderProps) {
   const { currentLocation, getLowStockItems } = useStore();
+  const { findLocation } = useWorkspace();
   const lowStockCount = getLowStockItems().length;
-  const locationName = LOCATIONS.find(l => l.id === currentLocation)?.name ?? 'Inventory';
+  const locationName = findLocation(currentLocation)?.name ?? 'Inventory';
 
   return (
     <header className="md:hidden glass-card border-b border-white/10 px-4 py-3 flex items-center justify-between safe-area-inset-top">

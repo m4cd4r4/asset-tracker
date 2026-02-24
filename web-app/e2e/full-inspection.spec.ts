@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { DEMO_WORKSPACE_CONFIG } from './helpers/demo-config';
 
 // Helper: wait for sheet overlay to disappear
 async function waitForSheetClose(page: any) {
@@ -55,9 +56,11 @@ async function clickLocation(page: any, name: string, viewport: any) {
 }
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript((config) => {
+    localStorage.clear();
+    localStorage.setItem('euc_workspace_config', JSON.stringify(config));
+  }, DEMO_WORKSPACE_CONFIG);
   await page.goto('/');
-  await page.evaluate(() => localStorage.clear());
-  await page.reload();
   await page.waitForLoadState('networkidle');
 });
 
@@ -96,10 +99,11 @@ test.describe('2. Sidebar Navigation', () => {
     if ((viewport?.width ?? 1440) < 768) return;
     const sidebar = page.locator('aside').first();
     await expect(sidebar).toBeVisible();
-    await expect(sidebar.getByText('Inventory')).toBeVisible();
-    await expect(sidebar.getByText('Activity')).toBeVisible();
-    await expect(sidebar.getByText('Reports')).toBeVisible();
-    await expect(sidebar.getByText('SAN Registry')).toBeVisible();
+    await expect(sidebar.getByText('Inventory', { exact: true })).toBeVisible();
+    await expect(sidebar.getByText('Activity', { exact: true })).toBeVisible();
+    await expect(sidebar.getByText('Reports', { exact: true })).toBeVisible();
+    await expect(sidebar.getByText('SAN Registry', { exact: true })).toBeVisible();
+    await expect(sidebar.getByText('Settings', { exact: true })).toBeVisible();
     await page.screenshot({ path: 'e2e/results/04-sidebar-desktop.png', fullPage: true });
   });
 

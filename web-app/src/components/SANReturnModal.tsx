@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '@/store/useStore';
-import { GENERATIONS, type Generation } from '@/types';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -13,9 +13,12 @@ interface SANReturnModalProps {
 
 export function SANReturnModal({ open, onClose }: SANReturnModalProps) {
   const { addSANReturn } = useStore();
+  const { assetTypes, assetNumberConfig } = useWorkspace();
+  const types = assetTypes();
+  const anConfig = assetNumberConfig();
 
   const [sanNumber, setSanNumber] = useState('');
-  const [generation, setGeneration] = useState<Generation>('G8');
+  const [generation, setGeneration] = useState(types[0]?.name ?? '');
   const [returnedBy, setReturnedBy] = useState('');
   const [returnedTo, setReturnedTo] = useState('');
   const [notes, setNotes] = useState('');
@@ -44,30 +47,29 @@ export function SANReturnModal({ open, onClose }: SANReturnModalProps) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Return SAN Asset</DialogTitle>
+          <DialogTitle>Return {anConfig.displayName} Asset</DialogTitle>
           <DialogDescription>Record a device being returned to stock.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">SAN Number</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">{anConfig.displayName} Number</label>
             <Input
               value={sanNumber}
-              onChange={(e) => setSanNumber(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="e.g. 12345"
-              inputMode="numeric"
+              onChange={(e) => setSanNumber(e.target.value)}
+              placeholder={anConfig.placeholder}
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Generation</label>
-            <Select value={generation} onValueChange={(v) => setGeneration(v as Generation)}>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Asset Type</label>
+            <Select value={generation} onValueChange={setGeneration}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {GENERATIONS.map(gen => (
-                  <SelectItem key={gen} value={gen}>{gen}</SelectItem>
+                {types.map(t => (
+                  <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

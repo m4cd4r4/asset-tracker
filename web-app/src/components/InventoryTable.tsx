@@ -3,7 +3,7 @@ import { useStore } from '@/store/useStore';
 import { Plus, Minus, AlertTriangle, ArrowUpDown, Pencil, RotateCcw, Package } from 'lucide-react';
 import { SANInputModal } from './SANInputModal';
 import { ThresholdEditor } from './ThresholdEditor';
-import { SAN_REQUIRED_ITEMS } from '@/types';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -11,10 +11,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 interface InventoryTableProps {
   onReturnSAN?: () => void;
+  onAddAsset?: () => void;
 }
 
-export function InventoryTable({ onReturnSAN }: InventoryTableProps) {
+export function InventoryTable({ onReturnSAN, onAddAsset }: InventoryTableProps) {
   const { assets, updateAssetCount, error, clearError } = useStore();
+  const { requiresAssetNumber, assetNumberConfig } = useWorkspace();
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<Record<string, number>>({});
   const [sanModalOpen, setSanModalOpen] = useState(false);
@@ -38,7 +40,7 @@ export function InventoryTable({ onReturnSAN }: InventoryTableProps) {
     const qty = quantity[assetId] || 1;
     if (!asset) return;
 
-    if (SAN_REQUIRED_ITEMS.includes(asset.item)) {
+    if (requiresAssetNumber(asset.item)) {
       setPendingOperation({ assetId, operation, quantity: qty });
       setSanModalOpen(true);
     } else {
@@ -82,12 +84,20 @@ export function InventoryTable({ onReturnSAN }: InventoryTableProps) {
       {/* Header */}
       <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-foreground">Inventory</h3>
-        {onReturnSAN && (
-          <Button variant="ghost" size="sm" onClick={onReturnSAN} className="h-7 text-xs gap-1.5">
-            <RotateCcw className="w-3 h-3" />
-            Return SAN
-          </Button>
-        )}
+        <div className="flex items-center gap-1.5">
+          {onAddAsset && (
+            <Button variant="ghost" size="sm" onClick={onAddAsset} className="h-7 text-xs gap-1.5">
+              <Plus className="w-3 h-3" />
+              Add Item
+            </Button>
+          )}
+          {onReturnSAN && (
+            <Button variant="ghost" size="sm" onClick={onReturnSAN} className="h-7 text-xs gap-1.5">
+              <RotateCcw className="w-3 h-3" />
+              Return {assetNumberConfig().displayName}
+            </Button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -127,7 +137,7 @@ export function InventoryTable({ onReturnSAN }: InventoryTableProps) {
         <TableBody>
           {sorted.map((asset) => {
             const isLowStock = asset.newCount < asset.threshold;
-            const isSAN = SAN_REQUIRED_ITEMS.includes(asset.item);
+            const isSAN = requiresAssetNumber(asset.item);
             const isSelected = selectedAsset === asset.id;
 
             return (
@@ -149,7 +159,7 @@ export function InventoryTable({ onReturnSAN }: InventoryTableProps) {
                     <span className="font-medium text-sm">{asset.item}</span>
                     {isSAN && (
                       <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 font-normal text-violet-500 border-violet-200">
-                        SAN
+                        {assetNumberConfig().displayName}
                       </Badge>
                     )}
                     {isLowStock && (

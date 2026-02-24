@@ -2,13 +2,13 @@ import { useState } from 'react';
 import {
   Package, Activity, BarChart3, Hash, Scan, Box, ScanText, Download,
   FileDown, FileUp, RotateCcw, AlertTriangle, ChevronDown,
-  MapPin, Moon, Sun,
+  MapPin, Moon, Sun, Settings,
 } from 'lucide-react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { useTheme } from '@/hooks/useTheme';
 import { useStore } from '@/store/useStore';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { storage } from '@/services/storage';
-import { LOCATIONS } from '@/types';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -36,10 +36,12 @@ export function Sidebar({
   onLocationChange,
 }: SidebarProps) {
   const { currentLocation, setLocation, getLowStockItems, assets } = useStore();
+  const { config, locations, assetNumberConfig } = useWorkspace();
   const [showDataMenu, setShowDataMenu] = useState(false);
   const { dark, toggle: toggleTheme } = useTheme();
   const { canInstall, install } = usePWAInstall();
   const lowStockCount = getLowStockItems().length;
+  const wsLocations = locations();
 
   const handleExport = () => {
     const data = storage.exportData();
@@ -82,8 +84,8 @@ export function Sidebar({
             <Package className="w-5 h-5 text-blue-400" />
           </div>
           <div>
-            <h1 className="text-white font-semibold text-sm leading-tight">EUC Asset</h1>
-            <p className="text-slate-500 text-xs">Tracker WA</p>
+            <h1 className="text-white font-semibold text-sm leading-tight">{config?.name || 'Asset'}</h1>
+            <p className="text-slate-500 text-xs">Tracker</p>
           </div>
         </div>
       </div>
@@ -94,7 +96,7 @@ export function Sidebar({
       <div className="px-3 py-3">
         <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Locations</p>
         <div className="space-y-0.5">
-          {LOCATIONS.map((loc) => {
+          {wsLocations.map((loc) => {
             const isActive = currentLocation === loc.id;
             const locAssets = assets.filter(a => a.location === loc.id);
             const totalItems = locAssets.reduce((sum, a) => sum + a.newCount, 0);
@@ -152,7 +154,19 @@ export function Sidebar({
             className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all hover:bg-white/5 text-slate-400 hover:text-slate-300"
           >
             <Hash className="w-4 h-4" />
-            <span>SAN Registry</span>
+            <span>{assetNumberConfig().displayName} Registry</span>
+          </button>
+          <button
+            onClick={() => onViewChange('settings')}
+            className={cn(
+              'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all',
+              activeView === 'settings'
+                ? 'bg-white/10 text-white'
+                : 'hover:bg-white/5 text-slate-400 hover:text-slate-300'
+            )}
+          >
+            <Settings className="w-4 h-4" />
+            <span>Settings</span>
           </button>
         </div>
       </div>

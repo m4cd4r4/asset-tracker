@@ -1,9 +1,11 @@
 import { Package, AlertTriangle, Hash, Activity } from 'lucide-react';
 import { useStore } from '@/store/useStore';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { cn } from '@/lib/utils';
 
 export function KPICards() {
   const { assets, sanRecords, transactions, currentLocation, getLowStockItems } = useStore();
+  const { assetNumberConfig } = useWorkspace();
 
   const totalItems = assets.reduce((sum, a) => sum + a.newCount, 0);
   const lowStockItems = getLowStockItems().filter(a => a.location === currentLocation);
@@ -28,7 +30,7 @@ export function KPICards() {
       bgColor: lowStockItems.length > 0 ? 'bg-amber-500/10' : 'bg-emerald-500/10',
     },
     {
-      label: 'SANs Tracked',
+      label: `${assetNumberConfig().displayName}s Tracked`,
       value: locationSANs.length,
       icon: Hash,
       color: 'text-violet-500',

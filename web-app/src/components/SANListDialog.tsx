@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { storage } from '@/services/storage';
-import { LOCATIONS } from '@/types';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { Hash, Search, Barcode } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { BarcodeDisplay } from './BarcodeDisplay';
@@ -21,6 +21,9 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
   const [locationFilter, setLocationFilter] = useState('all');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [barcodeForSAN, setBarcodeForSAN] = useState<string | null>(null);
+  const { locations, assetNumberConfig, findLocation } = useWorkspace();
+  const wsLocations = locations();
+  const anConfig = assetNumberConfig();
   const sanRecords = storage.getSANRecords();
 
   const filtered = sanRecords
@@ -37,7 +40,7 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
     return acc;
   }, {});
 
-  const activeLocations = LOCATIONS.filter(l => locationCounts[l.id]);
+  const activeLocations = wsLocations.filter(l => locationCounts[l.id]);
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setVisibleCount(PAGE_SIZE); setLocationFilter('all'); setSearch(''); } }}>
@@ -45,10 +48,10 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Hash className="w-5 h-5 text-violet-500" />
-            SAN Registry
+            {anConfig.displayName} Registry
           </DialogTitle>
           <DialogDescription>
-            {filtered.length} of {sanRecords.length} serial asset number{sanRecords.length !== 1 ? 's' : ''}.
+            {filtered.length} of {sanRecords.length} {anConfig.displayName.toLowerCase()}{sanRecords.length !== 1 ? 's' : ''}.
           </DialogDescription>
         </DialogHeader>
 
@@ -97,14 +100,14 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
         {filtered.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Hash className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">{search || locationFilter !== 'all' ? 'No matching SANs found' : 'No SANs recorded yet'}</p>
+            <p className="text-sm">{search || locationFilter !== 'all' ? `No matching ${anConfig.displayName}s found` : `No ${anConfig.displayName}s recorded yet`}</p>
           </div>
         ) : (
           <div className="max-h-80 overflow-auto -mx-2">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs">SAN</TableHead>
+                  <TableHead className="text-xs">{anConfig.displayName}</TableHead>
                   <TableHead className="text-xs">Item</TableHead>
                   <TableHead className="text-xs">Location</TableHead>
                   <TableHead className="text-xs">Date</TableHead>
@@ -113,7 +116,7 @@ export function SANListDialog({ open, onClose }: SANListDialogProps) {
               </TableHeader>
               <TableBody>
                 {visible.map(record => {
-                  const loc = LOCATIONS.find(l => l.id === record.location);
+                  const loc = findLocation(record.location);
                   const date = new Date(record.timestamp);
                   return (
                     <TableRow key={record.sanNumber}>

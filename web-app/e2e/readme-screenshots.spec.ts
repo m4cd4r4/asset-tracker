@@ -1,8 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { DEMO_WORKSPACE_CONFIG } from './helpers/demo-config';
 
 test.beforeEach(async ({ page, viewport }) => {
   test.skip(!!viewport && viewport.width < 768, 'Screenshot tests are desktop-only');
-  await page.addInitScript(() => localStorage.clear());
+  await page.addInitScript((config) => {
+    localStorage.clear();
+    localStorage.setItem('euc_workspace_config', JSON.stringify(config));
+  }, DEMO_WORKSPACE_CONFIG);
   await page.goto('/');
   await page.waitForSelector('table');
 });
