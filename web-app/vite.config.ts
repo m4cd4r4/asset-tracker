@@ -92,6 +92,10 @@ export default defineConfig({
     sourcemap: false,
     chunkSizeWarningLimit: 3000,
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        landing: path.resolve(__dirname, 'landing/index.html'),
+      },
       external: ['@tensorflow/tfjs', '@tensorflow-models/coco-ssd'],
       output: {
         globals: {

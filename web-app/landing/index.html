@@ -101,6 +101,50 @@
     </div>
   </section>
 
+  <!-- Demo Video -->
+  <section class="video-section" id="demo">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">Product walkthrough</p>
+        <h2 class="section-title">See it in action</h2>
+        <p class="section-subtitle">Setup wizard → live dashboard → add a location → count updates in real time.</p>
+      </div>
+      <div class="video-frame">
+        <div class="frame-chrome">
+          <span class="chrome-dot red"></span>
+          <span class="chrome-dot yellow"></span>
+          <span class="chrome-dot green"></span>
+          <span class="chrome-url">Asset Tracker — Demo</span>
+        </div>
+        <div class="video-inner">
+          <video
+            src="/demo.mp4"
+            autoplay
+            muted
+            loop
+            playsinline
+            class="demo-video"
+            poster="/demo-poster.jpg"
+          ></video>
+          <div class="video-fallback" id="videoFallback" style="display:none">
+            <img src="../e2e/results/readme-dark.png" alt="Asset Tracker dashboard" class="hero-screenshot">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Show screenshot fallback if video fails
+    const v = document.querySelector('.demo-video');
+    if (v) {
+      v.addEventListener('error', () => {
+        v.style.display = 'none';
+        document.getElementById('videoFallback').style.display = 'block';
+      });
+    }
+  </script>
+
   <!-- Problem / Solution -->
   <section class="problem-solution">
     <div class="container">
@@ -394,7 +438,7 @@
         <h2>Ready to track assets?</h2>
         <p>Install the PWA on your phone and start scanning. No accounts, no servers, no subscription. Just open and go.</p>
         <div class="cta-buttons">
-          <a href="../index.html" class="btn btn-primary btn-lg">
+          <a href="/app" class="btn btn-primary btn-lg">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Open App
           </a>
