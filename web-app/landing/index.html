@@ -101,6 +101,50 @@
     </div>
   </section>
 
+  <!-- Demo Video -->
+  <section class="video-section" id="demo">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">Product walkthrough</p>
+        <h2 class="section-title">See it in action</h2>
+        <p class="section-subtitle">Setup wizard → live dashboard → add a location → count updates in real time.</p>
+      </div>
+      <div class="video-frame">
+        <div class="frame-chrome">
+          <span class="chrome-dot red"></span>
+          <span class="chrome-dot yellow"></span>
+          <span class="chrome-dot green"></span>
+          <span class="chrome-url">Asset Tracker — Demo</span>
+        </div>
+        <div class="video-inner">
+          <video
+            src="/demo.mp4"
+            autoplay
+            muted
+            loop
+            playsinline
+            class="demo-video"
+            poster="/demo-poster.jpg"
+          ></video>
+          <div class="video-fallback" id="videoFallback" style="display:none">
+            <img src="../e2e/results/readme-dark.png" alt="Asset Tracker dashboard" class="hero-screenshot">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Show screenshot fallback if video fails
+    const v = document.querySelector('.demo-video');
+    if (v) {
+      v.addEventListener('error', () => {
+        v.style.display = 'none';
+        document.getElementById('videoFallback').style.display = 'block';
+      });
+    }
+  </script>
+
   <!-- Problem / Solution -->
   <section class="problem-solution">
     <div class="container">
