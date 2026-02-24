@@ -1,146 +1,157 @@
-# EUC Asset Tracker - Web App
+# Asset Tracker
 
-Azure Static Web App version of the EUC Asset Tracker with barcode scanning and quick-count features.
+A general-purpose, offline-first asset tracking PWA. Add your own locations, asset types, and define what an asset number looks like — then track inventory with full audit history, OCR scanning, barcode generation, and low-stock alerts.
+
+![Dashboard](e2e/results/readme-light.png)
 
 ## Features
 
-- **Multi-location inventory management** (Basement 4.2, Build Room, Darwin, Level 17, Basement 4.3)
-- **SAN tracking** for G8, G9, G10 devices with validation
-- **Barcode/QR scanning** via device camera or image upload
-- **Quick-count** box detection using TensorFlow.js
-- **PWA support** for mobile installation
-- **Offline-first** with localStorage (optional Azure Table Storage backend)
-- **Transaction logging** with full audit trail
-- **Low stock alerts** with configurable thresholds
+- **Customizable workspace** — define your own locations, asset types, and asset number format
+- **Setup wizard** — "Load Demo" (Perth IT preset) or "Start Fresh" with your own config
+- **Settings panel** — CRUD for locations, asset types, asset number config, workspace name
+- **Add Item dialog** — create new inventory items from the dashboard
+- **OCR scanning** — extract asset numbers from camera images in real time
+- **Barcode/QR scanning** — via device camera or image upload
+- **Quick-count** — box detection using TensorFlow.js
+- **PWA** — installable on mobile/desktop, offline-first with localStorage
+- **Transaction log** — full audit trail with timestamps
+- **Low stock alerts** — configurable per-item thresholds
+- **Dark mode** — system preference aware
+- **Responsive** — full sidebar on desktop, bottom sheet on mobile
+
+![Dark mode](e2e/results/readme-dark.png)
 
 ## Quick Start
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+npm run dev       # http://localhost:5173
+npm run build     # production build → dist/
+npm run preview   # preview production build
 ```
 
-## Deployment to Azure Static Web Apps
+## How It Works
 
-### Option 1: GitHub Actions (Recommended)
+### First Visit
 
-1. Create an Azure Static Web App in the Azure Portal
-2. Connect to your GitHub repository
-3. Add `AZURE_STATIC_WEB_APPS_API_TOKEN` to repository secrets
-4. Push to `main` branch - deployment is automatic
+On a fresh install you'll see the setup wizard:
 
-### Option 2: Azure CLI
+- **Load Demo** — loads a Perth IT inventory preset (56 assets, 5 locations, G-series laptops + desktops) so you can explore the full feature set immediately
+- **Start Fresh** — enter a workspace name, your first location, and optionally customise the asset number format
 
-```bash
-# Login to Azure
-az login
+### Settings
 
-# Create resource group
-az group create --name euc-asset-tracker-rg --location australiaeast
+Click **Settings** in the sidebar at any time to:
 
-# Create Static Web App
-az staticwebapp create \
-  --name euc-asset-tracker \
-  --resource-group euc-asset-tracker-rg \
-  --source https://github.com/YOUR_USERNAME/asset-tracker \
-  --location australiaeast \
-  --branch main \
-  --app-location "web-app" \
-  --api-location "web-app/api" \
-  --output-location "dist"
-```
+| Tab | What you can do |
+|-----|----------------|
+| Locations | Add / remove locations that appear in the sidebar and inventory |
+| Asset Types | Add / remove device/item types, group by category, mark which require asset numbers |
+| Asset Number | Change the display name ("SAN", "Asset Tag", "Serial"), regex pattern, OCR extraction pattern, prefix, and placeholder |
+| Workspace | Rename the workspace or reset to factory defaults |
 
-### Option 3: SWA CLI
+### Asset Number Config
 
-```bash
-# Install SWA CLI
-npm install -g @azure/static-web-apps-cli
+The asset number system is fully configurable. The default Perth IT preset uses a 5–6 digit SAN:
 
-# Build the app
-npm run build
+| Field | Default |
+|-------|---------|
+| Display name | SAN |
+| Pattern | `^\d{5,6}$` |
+| OCR pattern | `\b\d{5,6}\b` |
+| Placeholder | `e.g. 12345` |
 
-# Deploy
-swa deploy ./dist --api-location ./api
-```
+You can change this to any format — barcodes, alphanumeric tags, serials, etc.
 
 ## Project Structure
 
 ```
 web-app/
 ├── src/
-│   ├── components/       # React components
-│   │   ├── BarcodeScanner.tsx
-│   │   ├── BoxCounter.tsx
-│   │   ├── Header.tsx
-│   │   ├── InventoryTable.tsx
-│   │   ├── LocationSelector.tsx
-│   │   ├── SANInputModal.tsx
-│   │   └── TransactionLog.tsx
-│   ├── hooks/           # Custom React hooks
+│   ├── types/
+│   │   ├── index.ts           # Core inventory types
+│   │   └── workspace.ts       # WorkspaceConfig interfaces
+│   ├── services/
+│   │   ├── storage.ts         # localStorage CRUD + seed/export/import
+│   │   └── workspace.ts       # Config CRUD, validation, migration helpers
+│   ├── data/
+│   │   ├── seed.ts            # Perth IT demo data (56 assets)
+│   │   └── presets.ts         # PERTH_IT_PRESET + BLANK_PRESET
+│   ├── hooks/
+│   │   ├── useWorkspace.ts    # Zustand store for workspace config
+│   │   ├── useOCRScanner.ts   # OCR extraction (dynamic pattern from config)
 │   │   ├── useBarcodeScanner.ts
 │   │   └── useBoxCounter.ts
-│   ├── services/        # Data services
-│   │   └── storage.ts
-│   ├── store/           # State management
-│   │   └── useStore.ts
-│   ├── types/           # TypeScript types
-│   │   └── index.ts
+│   ├── store/
+│   │   └── useStore.ts        # Inventory state + actions
+│   ├── components/
+│   │   ├── SetupWizard.tsx    # First-run wizard
+│   │   ├── AddAssetDialog.tsx # Add item dialog
+│   │   ├── settings/
+│   │   │   ├── SettingsPanel.tsx
+│   │   │   ├── LocationSettings.tsx
+│   │   │   ├── AssetTypeSettings.tsx
+│   │   │   ├── AssetNumberSettings.tsx
+│   │   │   └── WorkspaceSettings.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Header.tsx
+│   │   ├── InventoryTable.tsx
+│   │   ├── SANInputModal.tsx
+│   │   ├── SANReturnModal.tsx
+│   │   ├── SANListDialog.tsx
+│   │   ├── LowStockDialog.tsx
+│   │   ├── InventoryChart.tsx
+│   │   ├── KPICards.tsx
+│   │   ├── BarcodeScanner.tsx
+│   │   └── BoxCounter.tsx
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
-├── api/                 # Azure Functions API
-│   └── src/functions/
-├── public/              # Static assets
-└── staticwebapp.config.json
+├── landing/                   # Static landing page
+├── e2e/                       # Playwright E2E tests
+│   ├── helpers/demo-config.ts # Test fixture
+│   ├── full-inspection.spec.ts
+│   ├── setup-wizard.spec.ts
+│   ├── settings.spec.ts
+│   └── v2-features.spec.ts
+└── public/                    # Icons, manifest
 ```
 
-## Environment Variables
+## Testing
 
-For the API backend (optional):
+```bash
+npx playwright test             # full suite (84 tests, 81 pass)
+npx playwright test --ui        # interactive test runner
+npx playwright show-report      # view last report
+```
 
-| Variable | Description |
-|----------|-------------|
-| `STORAGE_CONNECTION_STRING` | Azure Table Storage connection string |
+## Data & Storage
 
-## Data Storage
+All data lives in `localStorage` — no backend required.
 
-**Default: localStorage** - Works offline, no backend required
+| Key | Contents |
+|-----|----------|
+| `euc_workspace_config` | WorkspaceConfig (locations, asset types, asset number format) |
+| `euc_assets` | Inventory items per location |
+| `euc_transactions` | Full transaction log |
 
-**Optional: Azure Table Storage** - For multi-user/multi-device sync:
-1. Create an Azure Storage Account
-2. Add connection string to Static Web App settings
-3. Update `storage.ts` to call API endpoints
+**Export / Import** — use the export button in the dashboard to download a JSON snapshot. Import it on another device to restore both config and data.
+
+**Backward compatibility** — if `euc_assets` exists but `euc_workspace_config` does not (legacy install), the app silently creates the Perth IT config on first load. No data is lost.
+
+## TensorFlow.js / Box Counter
+
+TensorFlow.js is loaded from CDN to keep bundle size small.
+
+To bundle it locally (requires Azure Static Web Apps Standard or self-hosting):
+1. Remove `@tensorflow/tfjs` and `@tensorflow-models/coco-ssd` from the `external` array in `vite.config.ts`
+2. Remove the CDN `<script>` tags from `index.html`
+3. Change `window.tf` / `window.cocoSsd` back to imports in `src/hooks/useBoxCounter.ts`
 
 ## Browser Support
 
-- Chrome/Edge 80+
-- Firefox 78+
-- Safari 14+
-- Mobile browsers with camera access
+Chrome/Edge 80+, Firefox 78+, Safari 14+, mobile browsers with camera access.
 
 ## License
 
 MIT
-
-
-## TensorFlow.js Configuration
-
-**Current: CDN Loading** - TensorFlow.js is loaded from a CDN to stay within Azure Static Web Apps Free tier limits (250MB).
-
-**Trade-off:** Box counting requires an internet connection and won't work offline.
-
-**To enable offline box counting:**
-1. In `vite.config.ts`, remove `@tensorflow/tfjs` and `@tensorflow-models/coco-ssd` from the `external` array
-2. In `index.html`, remove the TensorFlow CDN `<script>` tags
-3. In `src/hooks/useBoxCounter.ts`, change `window.tf`/`window.cocoSsd` back to imports
-4. Upgrade to Azure Static Web Apps Standard tier ($9/mo) or self-host
-
