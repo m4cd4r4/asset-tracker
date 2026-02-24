@@ -1,7 +1,13 @@
 export { Header } from './Header';
-export { LocationSelector } from './LocationSelector';
+export { Sidebar } from './Sidebar';
 export { InventoryTable } from './InventoryTable';
+export { InventoryChart } from './InventoryChart';
 export { TransactionLog } from './TransactionLog';
+export { KPICards } from './KPICards';
 export { SANInputModal } from './SANInputModal';
+export { SANReturnModal } from './SANReturnModal';
+export { SANListDialog } from './SANListDialog';
+export { LowStockDialog } from './LowStockDialog';
+export { ThresholdEditor } from './ThresholdEditor';
 export { BarcodeScanner } from './BarcodeScanner';
 export { BoxCounter } from './BoxCounter';
