@@ -1,6 +1,6 @@
 # EUC Asset Tracker v2 — Western Australia
 
-A glassmorphism web dashboard for managing End User Computing (EUC) inventory across five locations in Western Australia and Darwin. Built with React, TypeScript, and Tailwind CSS.
+A web dashboard for managing End User Computing (EUC) inventory across five locations in Western Australia and Darwin. Built with React, TypeScript, and Tailwind CSS.
 
 ![Dashboard — Light Mode](screenshots/dashboard-light.png)
 
