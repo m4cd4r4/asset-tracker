@@ -6,9 +6,9 @@
 
 ---
 
-## Demo: Perth IT Inventory (Lions Eye Institute, WA)
+## Demo: Perth IT Inventory
 
-The built-in "Load Demo" preset loads a real-world IT inventory from the Lions Eye Institute in Perth, WA. It's a working example you can explore immediately — no setup required.
+The built-in "Load Demo" preset loads a real-world IT inventory. It's a working example you can explore immediately — no setup required.
 
 **What the demo contains:**
 
